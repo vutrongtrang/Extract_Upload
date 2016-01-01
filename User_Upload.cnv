@@ -1,0 +1,112 @@
+create table ESLTPTADM.USER_UPLOAD
+(
+  USER_UPLOAD_ID        NUMBER(10) not null,
+  USER_NAME             NVARCHAR2(128) not null,
+  DELIVERY_CHANNEL      NVARCHAR2(32),
+  PASSWORD              RAW(64),
+  USER_DISABLED         NVARCHAR2(1),
+  USER_DESCRIPTION      NVARCHAR2(64),
+  AGENTID               NUMBER(8),
+  FIRST_NAME            NVARCHAR2(40),
+  LAST_NAME             NVARCHAR2(40),
+  PRIMARY_LOCATION_NAME VARCHAR2(128),
+  EMAIL_ADDRESS         NVARCHAR2(64),
+  SUPERVISORY_LEVEL     NUMBER(3) default 0 not null,
+  PWD_EXPIRES           CHAR(1),
+  IS_TEMPORARY          CHAR(1),
+  STREET                NVARCHAR2(64),
+  CITY                  NVARCHAR2(32),
+  STATE_PROVINCE        NVARCHAR2(32),
+  COUNTRY               NVARCHAR2(32),
+  POSTAL_CODE           NVARCHAR2(10),
+  IS_FLOATER            NVARCHAR2(1) default 'N' not null,
+  IS_SUPERVISOR         NVARCHAR2(1),
+  IS_MANAGER            NVARCHAR2(1),
+  TITLE_VN              NVARCHAR2(80),
+  TITLE_EN              NVARCHAR2(80),
+  SSN                   NVARCHAR2(11),
+  DEPARTMENT_VN         NVARCHAR2(32),
+  DEPARTMENT_EN         NVARCHAR2(32),
+  AREA_CODE             NUMBER(3),
+  PHONE_NUMBER          NUMBER(7),
+  EMPLOYEE_NUMBER       NVARCHAR2(32),
+  USER_ID               NUMBER(10),
+  ERR_MSG               VARCHAR2(1000)
+)
+/
+
+create or replace synonym tptux.USER_UPLOAD for ESLTPTADM.USER_UPLOAD;
+ 
+grant select, insert, update, delete on ESLTPTADM.USER_UPLOAD to tptux;
+
+
+create table ESLTPTADM.USER_LOCATION_UPLOAD
+(
+  USER_UPLOAD_ID          NUMBER(10) not null,
+  LOCATION_NAME	  VARCHAR2(128) not null, 
+  START_DATE       DATE,
+  END_DATE         DATE,
+  IS_PRIMARY       NVARCHAR2(1),
+  BANK_ID          NUMBER(10),
+  REGION_ID        NUMBER(10)
+)
+/
+
+create or replace synonym tptux.USER_LOCATION_UPLOAD for ESLTPTADM.USER_LOCATION_UPLOAD;
+ 
+grant select, insert, update, delete on ESLTPTADM.USER_LOCATION_UPLOAD to tptux;
+
+
+create table ESLTPTADM.USER_ROLE_UPLOAD
+(
+  USER_UPLOAD_ID          NUMBER(10) not null,
+  ROLE_NAME         NVARCHAR2(16) not null,
+  ISDEFAULT NVARCHAR2(1),
+  LOB_ID    NUMBER(10),
+  SYNC_FLG  NVARCHAR2(1) default 'Y'
+)
+/
+
+create or replace synonym tptux.USER_ROLE_UPLOAD for ESLTPTADM.USER_ROLE_UPLOAD;
+ 
+grant select, insert, update, delete on ESLTPTADM.USER_ROLE_UPLOAD to tptux;
+
+grant select, insert, delete, update on CORXPRADM.address to ESLTPTADM;
+
+grant select on CORXPRADM.Usersid to ESLTPTADM;
+
+grant select on CORXPRADM.Addressid to ESLTPTADM;
+
+create table ESLTPTADM.DRAWER_ASSIGNMENTS_UPLOAD
+(
+  UPLOAD_ID          NUMBER(20) not null,
+  USER_NAME                 NVARCHAR2(128) not null,
+  CASH_DRAWER_NAME    NVARCHAR2(18) not null,
+  LOCATION_NAME	  VARCHAR2(128) not null, 
+  is_default char(1),
+  status char(1)
+)
+/
+
+create or replace synonym tptux.DRAWER_ASSIGNMENTS_UPLOAD for ESLTPTADM.DRAWER_ASSIGNMENTS_UPLOAD;
+ 
+grant select, insert, update, delete on ESLTPTADM.DRAWER_ASSIGNMENTS_UPLOAD to tptux;
+
+--Upload Script 
+insert into ESLTPTADM.DRAWER_ASSIGNMENTS
+select a.user_id, c.cash_drawer_id, b.is_default   from tptux.users a, ESLTPTADM.DRAWER_ASSIGNMENTS_UPLOAD b, tptux.cash_drawer c
+where 
+a.user_name = b.user_name and 
+b.cash_drawer_name = c.cash_drawer_name;
+
+--To be Implemented 
+select * from ESLTPTADM.USER_SKILL;
+/
+select * from ESLTPTADM.TEAM_MEMBERS;
+/
+
+select * from ESLTPTADM.EXTENSION_LIST
+/
+
+select * from CORXPRADM.USER_CLASS_MAPPING
+/

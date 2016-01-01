@@ -1,0 +1,120 @@
+delete from address where record exists in employee table
+
+delete from phone where record exists in employee table 
+
+reset the sequence as max value from the existing tables 
+
+
+1.populate upload table
+
+2. Delete from phone, address 
+3 disable constraint 
+4disable trigger
+
+
+5 cleanup
+
+6 cleaup_evn
+
+7 update ESLTPTADM.LOCATION_LOG set is_settled = 'Y';
+ 
+8 sequence drop recreate
+
+9 grant, recompile synonym 
+
+10 enable triggers to popopulate frap data during upload
+
+11 run Upload scripts 
+
+12 enable constraint after all steps 
+
+select *  from tptux.phone p where exists
+(
+       select * from tptux.employee e where e.home_phone = p.phone_id 
+)
+/
+
+select *  from tptux.address p where exists
+(
+       select * from tptux.employee e where e.home_address = p.address_id 
+)
+/
+
+
+
+delete   from tptux.phone p where exists
+(
+       select * from tptux.employee e where e.home_phone = p.phone_id 
+)
+/
+
+delete  from tptux.address p where exists
+(
+       select * from tptux.employee e where e.home_address = p.address_id 
+)
+/
+
+
+impdp 'userid="/ as sysdba"' SCHEMAS=ESLTPTADM,SECFRPADM,CORXPRADM  DIRECTORY=DATAPUMP dumpfile=24DECDEV4TPX.dmp LOGFILE=24DECDEV4TPX_imp.log
+
+impdp 'userid="/ as sysdba"' tables=CORXPRADM.back_logons DIRECTORY=DATAPUMP dumpfile=24DECDEV4TPX.dmp LOGFILE=24DECDEV4TPX_imp_table.log TABLE_EXISTS_ACTION=append
+
+
+impdp 'userid="/ as sysdba"' tables=CORXPRADM.user_class_mapping DIRECTORY=DATAPUMP dumpfile=24DECDEV4TPX.dmp LOGFILE=24DECDEV4TPX_imp_user_class_mapping.log TABLE_EXISTS_ACTION=append
+
+
+impdp scott/tiger@db10g tables=EMP,DEPT directory=TEST_DIR dumpfile=EMP_DEPT.dmp logfile=impdpEMP_DEPT.log
+
+
+validated constraint
+update tptux.employee 
+set first_name = 'xxx'
+where first_name is null 
+/
+
+update tptux.employee 
+set last_name = 'yyy'
+where last_name is null 
+/
+
+
+update ESLTPTADM.EMPLOYEE set EMP_MODIFIED_BY = (select user_id from tptux.users where user_name = 'administrator'),
+EMP_CREATOR = (select user_id from tptux.users where user_name = 'administrator')
+/
+
+delete from  ESLTPTADM.CAMPAIGN; --should be cleared
+
+delete from CORXPRADM.BACK_LOGONS; --back_logons contains credential to log in profile back end for individual profile user 
+
+
+update CORXPRADM.EXCHANGE_RATE_MARGINs set user_id = (select user_id from tptux.users where user_name = 'administrator');
+
+update ESLTPTADM.EBS_TRANSACTION set user_id =  (select user_id from tptux.users where user_name = 'administrator');
+
+
+
+update ESLTPTADM.CASE_TYPE set locked_by = (select user_id from tptux.users where user_name = 'administrator') where locked_by is not null;
+
+
+update ESLTPTADM.LOCATION_LOG set user_id = (select user_id from tptux.users where user_name = 'administrator') where user_id is not null;
+
+
+--Careful about this back log table correction for the user_id 
+
+--steps not confirmed 
+update tptux.back_logons b set user_id = 
+(
+       select user_id from tptux.users u where u.user_name = (select user_name from tptux.user_upload a
+       where a.user_upload_id = b.user_id )
+)
+/
+update CORXPRADM.user_class_mapping  b set user_id = 
+(
+       select user_id from tptux.users u where u.user_name = (select user_name from tptux.user_upload a
+       where a.user_upload_id = b.user_id )
+)
+/
+
+campagin should be cleared 
+update ESLTPTADM.CAMPAIGN set user_id = (select user_id from tptux.users where user_name = 'administrator');
+/

@@ -1,0 +1,47 @@
+create table ESLTPTADM.WORKSTATION_UPLOAD
+(
+  WORKSTATION_UPLOAD_ID          NUMBER(10) not null,
+  LOCATION_NAME	  VARCHAR2(128) not null, 
+  WORKSTATION_NAME  VARCHAR2(32) not null,	
+  WORKSTATION_DESCRIPTION  VARCHAR2(64), 	
+  WORKSTATION_TYPE  VARCHAR2(32),
+  WORKSTATION_ID          NUMBER(10) null
+ );
+ 
+ create or replace synonym tptux.WORKSTATION_UPLOAD for ESLTPTADM.WORKSTATION_UPLOAD;
+ 
+ grant select, insert, update, delete on ESLTPTADM.WORKSTATION_UPLOAD to tptux;
+ 
+ --khong dung den 
+create table ESLTPTADM.WORKSTATION_DEVICE_UPLOAD
+(
+	WORKSTATION_UPLOAD_ID          NUMBER(10) not null,
+	DEVICE_ID      NUMBER(10) not null
+);	
+ 
+create or replace synonym tptux.WORKSTATION_DEVICE_UPLOAD for ESLTPTADM.WORKSTATION_DEVICE_UPLOAD;
+
+grant select, insert, update, delete on ESLTPTADM.WORKSTATION_DEVICE_UPLOAD to tptux;
+ 
+ 
+create table ESLTPTADM.WORKSTA_DEVICE_ATTR_UPLOAD
+(
+	WORKSTATION_UPLOAD_ID          NUMBER(10) not null,
+	DEVICE_ID      NUMBER(10) not null,
+	ATTRIBUTE_ID   NUMBER(10) not null
+);	
+ 
+create or replace synonym tptux.WORKSTA_DEVICE_ATTR_UPLOAD for ESLTPTADM.WORKSTA_DEVICE_ATTR_UPLOAD;
+
+grant select, insert, update, delete on ESLTPTADM.WORKSTA_DEVICE_ATTR_UPLOAD to tptux;
+
+grant select on CORXPRADM.location_codes to ESLTPTADM;
+
+grant execute on ESLTPTADM.PROC_WORKSTATION_UPLOAD to tptux;
+
+create synonym tptux.PROC_WORKSTATION_UPLOAD for ESLTPTADM.PROC_WORKSTATION_UPLOAD;
+
+
+--To be implemented
+select * from ESLTPTADM.EXTENSION_LIST
+/

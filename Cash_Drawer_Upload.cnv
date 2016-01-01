@@ -1,0 +1,40 @@
+create table ESLTPTADM.CASH_DRAWER_UPLOAD
+(
+  CASH_DRAWER_UPLOAD_ID      NUMBER(31) not null,
+  CASH_DRAWER_NAME    NVARCHAR2(18) not null,
+  LOCATION_NAME	  VARCHAR2(128) not null, 
+  DRAWER_TYPE_NAME        NVARCHAR2(32) not null, 
+  CURRENCY_CODE       NVARCHAR2(3),
+  ZERO_BALANCE        VARCHAR2(1),
+  CASH_DRAWER_ID      NUMBER(31)
+)
+/
+status default 'V'
+--cash_drawer_ml automatically populated 
+
+create or replace synonym tptux.CASH_DRAWER_UPLOAD for ESLTPTADM.CASH_DRAWER_UPLOAD;
+ 
+grant select, insert, update, delete on ESLTPTADM.CASH_DRAWER_UPLOAD to tptux;
+
+create table ESLTPTADM.CASH_DRAWER_DATA_UPLOAD
+(
+  CASH_DRAWER_UPLOAD_ID      NUMBER(31) not null,
+  CASH_FIELD_NAME        NVARCHAR2(64),
+  VALUE            NUMBER(31,6),
+  VALUE_CCODE      NVARCHAR2(3)
+)
+/
+
+CASH_DRAWER_ID   NUMBER(31) not null, --from the drawer 
+  CASH_DRAWER_DATE DATE not null, -- location_log
+  ACCESS_COUNT     NUMBER(10), --default 0
+  VALUE_CCODE VN for VND 
+  
+create or replace synonym tptux.CASH_DRAWER_DATA_UPLOAD for ESLTPTADM.CASH_DRAWER_DATA_UPLOAD;
+ 
+grant select, insert, update, delete on ESLTPTADM.CASH_DRAWER_DATA_UPLOAD to tptux;
+
+grant execute on ESLTPTADM.PROC_CASH_DRAWER_UPLOAD to TPTUX;
+
+create or replace synonym tptux.PROC_CASH_DRAWER_UPLOAD for ESLTPTADM.PROC_CASH_DRAWER_UPLOAD;
+  
